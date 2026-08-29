@@ -3,18 +3,48 @@ import type { Octokit } from '@octokit/action'
 import type { Context } from './github.js'
 
 type Inputs = {
-  name: string
+  draftReleaseName: string
 }
 
 export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<void> => {
-  core.info(`The name is ${inputs.name}`)
+  const existingRelease = await findReleaseByTag(octokit, context, inputs.draftReleaseName)
+  if (existingRelease?.draft === false) {
+    core.info(`Release ${inputs.draftReleaseName} is already published`)
+    return
+  }
+  if (existingRelease?.draft === true) {
+    core.info(`Deleting the existing draft release ${inputs.draftReleaseName}`)
+    await octokit.repos.deleteRelease({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      release_id: existingRelease.id,
+    })
+  }
 
-  const { data: pulls } = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+  core.info(`Creating a draft release ${inputs.draftReleaseName}`)
+  const { data: release } = await octokit.repos.createRelease({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    commit_sha: context.sha,
+    name: inputs.draftReleaseName,
+    tag_name: inputs.draftReleaseName,
+    target_commitish: context.sha,
+    draft: true,
   })
-  for (const pull of pulls) {
-    core.info(`Associated pull request: ${pull.html_url}`)
+  core.info(`Created a draft release: ${release.html_url}`)
+}
+
+const findReleaseByTag = async (octokit: Octokit, context: Context, tag: string) => {
+  try {
+    const { data: release } = await octokit.repos.getReleaseByTag({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      tag,
+    })
+    return release
+  } catch (error) {
+    if (error instanceof Error && 'status' in error && error.status === 404) {
+      return undefined
+    }
+    throw error
   }
 }

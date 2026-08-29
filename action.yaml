@@ -1,8 +1,8 @@
-name: typescript-action
-description: Template of TypeScript Action
+name: create-draft-release-action
+description: Create a draft release
 inputs:
-  name:
-    description: Example
+  draft-release-name:
+    description: Name of release to create
     required: true
   token:
     description: GitHub token

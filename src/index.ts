@@ -5,7 +5,7 @@ import { run } from './run.js'
 try {
   await run(
     {
-      name: core.getInput('name', { required: true }),
+      draftReleaseName: core.getInput('draft-release-name', { required: true }),
     },
     getOctokit(),
     await getContext(),
