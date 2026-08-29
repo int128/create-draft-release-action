@@ -11,6 +11,11 @@ inputs:
     description: GitHub token
     required: true
     default: ${{ github.token }}
+outputs:
+  release-name:
+    description: If created, the name of the release
+  release-url:
+    description: If created, the URL of the release
 runs:
   using: 'node24'
   main: 'dist/index.js'

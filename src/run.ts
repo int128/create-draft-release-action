@@ -52,4 +52,6 @@ const createRelease = async (releaseName: string, octokit: Octokit, context: Con
     draft: true,
   })
   core.info(`Created a draft release: ${release.html_url}`)
+  core.setOutput('release-name', release.name)
+  core.setOutput('release-url', release.html_url)
 }
