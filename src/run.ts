@@ -20,7 +20,7 @@ export const run = async (inputs: Inputs, octokit: Octokit, context: Context): P
 }
 
 const createRelease = async (releaseName: string, octokit: Octokit, context: Context) => {
-  core.info(`Finding release ${releaseName}`)
+  core.info(`Finding release: ${releaseName}`)
   const { data: releases } = await octokit.repos.listReleases({
     owner: context.repo.owner,
     repo: context.repo.repo,
@@ -42,7 +42,7 @@ const createRelease = async (releaseName: string, octokit: Octokit, context: Con
     }
   }
 
-  core.info(`Creating a draft release ${releaseName}`)
+  core.info(`Creating a draft release: ${releaseName}`)
   const { data: release } = await octokit.repos.createRelease({
     owner: context.repo.owner,
     repo: context.repo.repo,
