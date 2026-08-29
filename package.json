@@ -1,0 +1,29 @@
+{
+  "private": true,
+  "scripts": {
+    "check": "biome migrate --write && biome check --fix",
+    "build": "ncc build --source-map --license licenses.txt src/index.ts",
+    "test": "vitest"
+  },
+  "type": "module",
+  "dependencies": {
+    "@actions/core": "3.0.1",
+    "@octokit/action": "8.0.4",
+    "@octokit/plugin-retry": "8.1.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.10",
+    "@octokit/webhooks-types": "7.6.1",
+    "@tsconfig/node24": "24.0.5",
+    "@tsconfig/strictest": "2.0.8",
+    "@types/node": "24.13.3",
+    "@vercel/ncc": "0.45.0",
+    "pnpm": "11.20.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "packageManager": "pnpm@11.20.0"
+}
