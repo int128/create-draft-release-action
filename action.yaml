@@ -1,9 +1,12 @@
 name: create-draft-release-action
 description: Create a draft release
 inputs:
-  draft-release-name:
+  release-name:
     description: Name of release to create
-    required: true
+    required: false
+  release-name-file:
+    description: Path to file of release name
+    required: false
   token:
     description: GitHub token
     required: true
