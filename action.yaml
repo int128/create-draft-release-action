@@ -2,10 +2,13 @@ name: create-draft-release-action
 description: Create a draft release
 inputs:
   release-name:
-    description: Name of release to create
+    description: The name of release to create
     required: false
   release-name-file:
-    description: Path to file of release name
+    description: The path to file of release name
+    required: false
+  body:
+    description: The body of release
     required: false
   dry-run:
     description: If true, do not delete or create any release actually
