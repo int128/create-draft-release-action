@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: int128/create-draft-release-action@v1
         with:
-          draft-release-name: next
+          release-name: next
 ```
 
 ## Specification

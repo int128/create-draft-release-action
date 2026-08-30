@@ -1,8 +1,8 @@
-import assert from 'node:assert'
 import * as fs from 'node:fs/promises'
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
 import type { Context } from './github.js'
+import { bumpVersion } from './semver.js'
 
 type Inputs = {
   releaseName: string
@@ -29,23 +29,11 @@ const inferNextReleaseName = async (octokit: Octokit, context: Context) => {
   })
   const latestReleaseName = latestRelease.tag_name
   core.info(`Found the latest release ${latestReleaseName}`)
-  const nextReleaseName = bump(latestReleaseName)
+  const nextReleaseName = bumpVersion(latestReleaseName)
   if (!nextReleaseName) {
     return 'next'
   }
   return nextReleaseName
-}
-
-const bump = (version: string) => {
-  const matcher = version.match(/^(v?\d+)\.(\d+)\.(\d+)(.*)$/)
-  if (!matcher) {
-    return
-  }
-  const [, major, minor, patch, suffix] = matcher
-  assert(major, `semver must have the major part`)
-  assert(minor, `semver must have the minor part`)
-  assert(patch, `semver must have the patch part`)
-  return `${major}.${minor}.${Number.parseInt(patch, 10) + 1}${suffix}`
 }
 
 const createRelease = async (releaseName: string, dryRun: boolean, octokit: Octokit, context: Context) => {
