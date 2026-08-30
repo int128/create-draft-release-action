@@ -16,8 +16,9 @@ export const run = async (inputs: Inputs, octokit: Octokit, context: Context): P
     return await createRelease(inputs, octokit, context)
   }
   if (inputs.releaseNameFile) {
-    const releaseName = await fs.readFile(inputs.releaseNameFile, 'utf8')
-    return await createRelease({ ...inputs, releaseName: releaseName.trim() }, octokit, context)
+    const content = await fs.readFile(inputs.releaseNameFile, 'utf8')
+    const releaseName = content.trim()
+    return await createRelease({ ...inputs, releaseName }, octokit, context)
   }
   const releaseName = await inferNextReleaseName(octokit, context)
   return await createRelease({ ...inputs, releaseName }, octokit, context)
