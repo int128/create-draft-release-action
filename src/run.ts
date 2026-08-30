@@ -7,19 +7,21 @@ import { bumpVersion } from './semver.js'
 type Inputs = {
   releaseName: string
   releaseNameFile: string
+  body: string
   dryRun: boolean
 }
 
 export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<void> => {
   if (inputs.releaseName) {
-    return await createRelease(inputs.releaseName, inputs.dryRun, octokit, context)
+    return await createRelease(inputs, octokit, context)
   }
   if (inputs.releaseNameFile) {
-    const releaseName = await fs.readFile(inputs.releaseNameFile, 'utf8')
-    return await createRelease(releaseName.trim(), inputs.dryRun, octokit, context)
+    const content = await fs.readFile(inputs.releaseNameFile, 'utf8')
+    const releaseName = content.trim()
+    return await createRelease({ ...inputs, releaseName }, octokit, context)
   }
   const releaseName = await inferNextReleaseName(octokit, context)
-  return await createRelease(releaseName, inputs.dryRun, octokit, context)
+  return await createRelease({ ...inputs, releaseName }, octokit, context)
 }
 
 const inferNextReleaseName = async (octokit: Octokit, context: Context) => {
@@ -36,18 +38,18 @@ const inferNextReleaseName = async (octokit: Octokit, context: Context) => {
   return nextReleaseName
 }
 
-const createRelease = async (releaseName: string, dryRun: boolean, octokit: Octokit, context: Context) => {
-  core.info(`Finding release: ${releaseName}`)
+const createRelease = async (inputs: Omit<Inputs, 'releaseNameFile'>, octokit: Octokit, context: Context) => {
+  core.info(`Finding release: ${inputs.releaseName}`)
   const { data: releases } = await octokit.repos.listReleases({
     owner: context.repo.owner,
     repo: context.repo.repo,
     per_page: 100,
   })
 
-  const existingReleases = releases.filter((release) => release.name === releaseName)
+  const existingReleases = releases.filter((release) => release.name === inputs.releaseName)
   for (const existingRelease of existingReleases) {
     if (existingRelease.draft) {
-      if (dryRun) {
+      if (inputs.dryRun) {
         core.info(`[dry-run] Deleting the existing draft release: ${existingRelease.html_url}`)
         continue
       }
@@ -58,22 +60,23 @@ const createRelease = async (releaseName: string, dryRun: boolean, octokit: Octo
         release_id: existingRelease.id,
       })
     } else {
-      core.info(`Release ${releaseName} is already published: ${existingRelease.html_url}`)
+      core.info(`Release ${inputs.releaseName} is already published: ${existingRelease.html_url}`)
       return
     }
   }
 
-  if (dryRun) {
-    core.info(`[dry-run] Creating a draft release: ${releaseName}`)
+  if (inputs.dryRun) {
+    core.info(`[dry-run] Creating a draft release: ${inputs.releaseName}`)
     return
   }
-  core.info(`Creating a draft release: ${releaseName}`)
+  core.info(`Creating a draft release: ${inputs.releaseName}`)
   const { data: release } = await octokit.repos.createRelease({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    name: releaseName,
-    tag_name: releaseName,
+    name: inputs.releaseName,
+    tag_name: inputs.releaseName,
     target_commitish: context.sha,
+    body: inputs.body,
     draft: true,
   })
   core.info(`Created a draft release: ${release.html_url}`)

@@ -31,8 +31,9 @@ For example, if the latest release is `v1.2.3`, this action creates a draft rele
 
 | Name                | Default | Description                                           |
 | ------------------- | ------- | ----------------------------------------------------- |
-| `release-name`      | -       | Name of release to create                             |
-| `release-name-file` | -       | Path to file of release name                          |
+| `release-name`      | -       | The name of release to create                         |
+| `release-name-file` | -       | The path to file of release name                      |
+| `body`              | -       | The body of release                                   |
 | `dry-run`           | false   | If true, do not delete or create any release actually |
 
 ### Outputs
