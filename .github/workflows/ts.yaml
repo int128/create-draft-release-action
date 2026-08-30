@@ -37,8 +37,6 @@ jobs:
 
       - name: Run int128/create-draft-release-action
         uses: ./
-        with:
-          release-name: next
 
   generate:
     runs-on: ubuntu-latest

@@ -28,11 +28,9 @@ jobs:
 
 | Name                | Default | Description                                           |
 | ------------------- | ------- | ----------------------------------------------------- |
-| `release-name`      | (\*1)   | Name of release to create                             |
-| `release-name-file` | (\*1)   | Path to file of release name                          |
+| `release-name`      | -       | Name of release to create                             |
+| `release-name-file` | -       | Path to file of release name                          |
 | `dry-run`           | false   | If true, do not delete or create any release actually |
-
-(\*1): Either `release-name` or `release-name-file` must be provided.
 
 ### Outputs
 
