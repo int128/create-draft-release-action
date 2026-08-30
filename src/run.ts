@@ -1,8 +1,8 @@
+import assert from 'node:assert'
 import * as fs from 'node:fs/promises'
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
 import type { Context } from './github.js'
-import assert from 'node:assert'
 
 type Inputs = {
   releaseName: string
