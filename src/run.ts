@@ -6,20 +6,21 @@ import type { Context } from './github.js'
 type Inputs = {
   releaseName: string
   releaseNameFile: string
+  dryRun: boolean
 }
 
 export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<void> => {
   if (inputs.releaseName) {
-    return await createRelease(inputs.releaseName, octokit, context)
+    return await createRelease(inputs.releaseName, inputs.dryRun, octokit, context)
   }
   if (inputs.releaseNameFile) {
     const releaseName = await fs.readFile(inputs.releaseNameFile, 'utf8')
-    return await createRelease(releaseName.trim(), octokit, context)
+    return await createRelease(releaseName.trim(), inputs.dryRun, octokit, context)
   }
-  throw new Error('Either releaseName or releaseNameFile must be provided')
+  throw new Error('Either release-name or release-name-file must be provided')
 }
 
-const createRelease = async (releaseName: string, octokit: Octokit, context: Context) => {
+const createRelease = async (releaseName: string, dryRun: boolean, octokit: Octokit, context: Context) => {
   core.info(`Finding release: ${releaseName}`)
   const { data: releases } = await octokit.repos.listReleases({
     owner: context.repo.owner,
@@ -30,6 +31,10 @@ const createRelease = async (releaseName: string, octokit: Octokit, context: Con
   const existingReleases = releases.filter((release) => release.name === releaseName)
   for (const existingRelease of existingReleases) {
     if (existingRelease.draft) {
+      if (dryRun) {
+        core.info(`[dry-run] Deleting the existing draft release: ${existingRelease.html_url}`)
+        continue
+      }
       core.info(`Deleting the existing draft release: ${existingRelease.html_url}`)
       await octokit.repos.deleteRelease({
         owner: context.repo.owner,
@@ -42,6 +47,10 @@ const createRelease = async (releaseName: string, octokit: Octokit, context: Con
     }
   }
 
+  if (dryRun) {
+    core.info(`[dry-run] Creating a draft release: ${releaseName}`)
+    return
+  }
   core.info(`Creating a draft release: ${releaseName}`)
   const { data: release } = await octokit.repos.createRelease({
     owner: context.repo.owner,

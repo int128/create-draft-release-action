@@ -7,6 +7,7 @@ try {
     {
       releaseName: core.getInput('release-name'),
       releaseNameFile: core.getInput('release-name-file'),
+      dryRun: core.getBooleanInput('dry-run', { required: true }),
     },
     getOctokit(),
     await getContext(),
