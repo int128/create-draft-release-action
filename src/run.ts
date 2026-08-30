@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises'
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
 import type { Context } from './github.js'
+import { bumpVersion } from './semver.js'
 
 type Inputs = {
   releaseName: string
@@ -17,7 +18,22 @@ export const run = async (inputs: Inputs, octokit: Octokit, context: Context): P
     const releaseName = await fs.readFile(inputs.releaseNameFile, 'utf8')
     return await createRelease(releaseName.trim(), inputs.dryRun, octokit, context)
   }
-  throw new Error('Either release-name or release-name-file must be provided')
+  const releaseName = await inferNextReleaseName(octokit, context)
+  return await createRelease(releaseName, inputs.dryRun, octokit, context)
+}
+
+const inferNextReleaseName = async (octokit: Octokit, context: Context) => {
+  const { data: latestRelease } = await octokit.repos.getLatestRelease({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+  })
+  const latestReleaseName = latestRelease.tag_name
+  core.info(`Found the latest release ${latestReleaseName}`)
+  const nextReleaseName = bumpVersion(latestReleaseName)
+  if (!nextReleaseName) {
+    return 'next'
+  }
+  return nextReleaseName
 }
 
 const createRelease = async (releaseName: string, dryRun: boolean, octokit: Octokit, context: Context) => {

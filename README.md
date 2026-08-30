@@ -19,8 +19,11 @@ jobs:
     steps:
       - uses: int128/create-draft-release-action@v1
         with:
-          draft-release-name: next
+          release-name: next
 ```
+
+If the release name is not given, this action infers the next release name by incrementing the patch version of the latest release name.
+For example, if the latest release is `v1.2.3`, this action creates a draft release as `v1.2.4`.
 
 ## Specification
 
@@ -28,11 +31,9 @@ jobs:
 
 | Name                | Default | Description                                           |
 | ------------------- | ------- | ----------------------------------------------------- |
-| `release-name`      | (\*1)   | Name of release to create                             |
-| `release-name-file` | (\*1)   | Path to file of release name                          |
+| `release-name`      | -       | Name of release to create                             |
+| `release-name-file` | -       | Path to file of release name                          |
 | `dry-run`           | false   | If true, do not delete or create any release actually |
-
-(\*1): Either `release-name` or `release-name-file` must be provided.
 
 ### Outputs
 
