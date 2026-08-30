@@ -7,6 +7,10 @@ inputs:
   release-name-file:
     description: Path to file of release name
     required: false
+  dry-run:
+    description: If true, do not delete or create any release actually
+    required: true
+    default: 'false'
   token:
     description: GitHub token
     required: true
