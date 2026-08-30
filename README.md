@@ -22,6 +22,9 @@ jobs:
           release-name: next
 ```
 
+If the release name is not given, this action infers the next release name by incrementing the patch version of the latest release name.
+For example, if the latest release is `v1.2.3`, this action creates a draft release as `v1.2.4`.
+
 ## Specification
 
 ### Inputs
