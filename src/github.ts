@@ -9,6 +9,7 @@ export type Context = {
     owner: string
     repo: string
   }
+  ref: string
   sha: string
 }
 
@@ -16,6 +17,7 @@ export const getContext = async (): Promise<Context> => {
   // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
   return {
     repo: getRepo(),
+    ref: getEnv('GITHUB_REF'),
     sha: getEnv('GITHUB_SHA'),
   }
 }

@@ -12,6 +12,11 @@ type Inputs = {
 }
 
 export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<void> => {
+  if (context.ref.startsWith('refs/tags/')) {
+    const releaseName = context.ref.substring('refs/tags/'.length)
+    core.info(`Creating a release for the current tag ${releaseName}`)
+    return await createRelease({ ...inputs, releaseName }, octokit, context)
+  }
   if (inputs.releaseName) {
     return await createRelease(inputs, octokit, context)
   }
@@ -38,7 +43,9 @@ const inferNextReleaseName = async (octokit: Octokit, context: Context) => {
   return nextReleaseName
 }
 
-const createRelease = async (inputs: Omit<Inputs, 'releaseNameFile'>, octokit: Octokit, context: Context) => {
+type CreateReleaseInputs = Omit<Inputs, 'releaseNameFile'>
+
+const createRelease = async (inputs: CreateReleaseInputs, octokit: Octokit, context: Context) => {
   core.info(`Finding release: ${inputs.releaseName}`)
   const { data: releases } = await octokit.repos.listReleases({
     owner: context.repo.owner,
